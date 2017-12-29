@@ -12,7 +12,7 @@
 
 #include "ftls.h"
 
-void	help_ls(void)
+int		help_ls(void)
 {
 	ft_printf("Usage: ft_ls [OPTION]... [FILE]...\n");
 	ft_printf("List information about the FILES \
@@ -26,13 +26,14 @@ mandatory for short options too.\n");
 	ft_printf("-t              sort by modification time, newest first\n");
 	ft_printf("-1              list one file per line\n");
 	ft_printf("--help          display this help and exit\n");
+	return (0);
 }
 
 int		main(int ac, char **av)
 {
-	if (!(ft_strcmp(av[1], "--help")))
-		help_ls();
-	else
-		parse_input(ac, av);
+	if(ac != 1)
+		if (!(ft_strcmp(av[1], "--help")))
+			return (help_ls());
+	parse_input(ac, av);
 	return (0);
 }
