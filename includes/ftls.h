@@ -37,15 +37,14 @@ typedef struct			s_data
 {
 	char				*file;
 	char				*bits;
+	int					mode;
 	// long long			blocks;
 	int					nlinks;
 	char				*uid;
 	char				*gid;
-	unsigned int		major;
-	unsigned int		minor;
-	// int					device;
+	int					device;
 	unsigned long long	size;
-	char				*mtime;
+	long				mtime;
 	struct s_data		*next;
 	struct s_data		**dir;
 }						t_data;
@@ -59,6 +58,8 @@ typedef struct			s_flags
 	int					re;
 	int					device;
 	long long			blocks;
+	int					endflag;
+	int					sort;
 	// int					nlinks;
 	// int					uid;
 	// int					gid;
@@ -82,6 +83,17 @@ typedef struct			s_flags
 /*
 ** parse_input.c
 */
-int		parse_input(int ac, char **av);
+int						parse_input(int ac, char **av);
+
+/*
+** parse_util.c
+*/
+char					*perms(int mode, t_flags *flags);
+
+/*
+** sort.c
+*/
+t_data					*sort_link_list(t_data *data,
+							t_flags *flags, int loop);
 
 #endif
