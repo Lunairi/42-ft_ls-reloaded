@@ -36,16 +36,18 @@
 typedef struct			s_data
 {
 	char				*file;
-	char				*dir;
-	long long			blocks;
+	char				*bits;
+	// long long			blocks;
 	int					nlinks;
-	int					uid;
-	int					gid;
+	char				*uid;
+	char				*gid;
 	unsigned int		major;
 	unsigned int		minor;
-	int					device;
+	// int					device;
 	unsigned long long	size;
+	char				*mtime;
 	struct s_data		*next;
+	struct s_data		**dir;
 }						t_data;
 
 typedef struct			s_flags
@@ -55,7 +57,8 @@ typedef struct			s_flags
 	int					l;
 	int					t;
 	int					re;
-	// long long			blocks;
+	int					device;
+	long long			blocks;
 	// int					nlinks;
 	// int					uid;
 	// int					gid;
