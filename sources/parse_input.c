@@ -79,6 +79,7 @@ int		set_list_elements(char *str, t_data *data, t_flags *flags)
 	data->size = items.st_size;
 	data->device = items.st_rdev;
 	data->mtime = items.st_mtime;
+	data->nsec = items.st_mtimespec.tv_nsec;
 	return (1);
 }
 
@@ -160,6 +161,8 @@ int		parse_input(int ac, char **av)
 		set_list_and_flags(av[i], flags, &data);
 	print_list(data);
 	data = sort_link_list(data, flags, 1);
+	if (flags->t == 1)
+		data = time_sort_link_list(data, flags, 1);
 	ft_printf("New sorted\n");
 	print_list(data);
 	free(data);

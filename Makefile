@@ -16,7 +16,7 @@ NAME	= ft_ls
 
 SRC		= main.c \
 			parse_input.c parse_util.c \
-			sort.c
+			sort.c sort_util.c
 OBJ 	= $(addprefix ./objects/, $(SRC:.c=.o))
 CFLAG	= -Wall -Wextra -Werror -g
 IFLAG	= -I libft -I includes -g

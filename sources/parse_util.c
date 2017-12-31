@@ -17,8 +17,9 @@
 ** This function is to help determine what type of mode the
 ** content that is being passed in is. It also will check for
 ** content that is is a block (b) and (c) type, which will require
-** major and minor devices to be displayed. 
+** major and minor devices to be displayed.
 */
+
 static int	file_type(int mode, t_flags *flags)
 {
 	char	c;
@@ -51,9 +52,10 @@ static int	file_type(int mode, t_flags *flags)
 /*
 ** Function: perms
 ** This function takes the mode passed in and parses the information
-** from it using macros and bit shifting. This way we can get the 
+** from it using macros and bit shifting. This way we can get the
 ** permissions stored into bits and pass it back.
 */
+
 char		*perms(int mode, t_flags *flags)
 {
 	static const char	*rwx[] = {"---", "--x", "-w-", "-wx",

@@ -45,6 +45,7 @@ typedef struct			s_data
 	int					device;
 	unsigned long long	size;
 	long				mtime;
+	long				nsec;
 	struct s_data		*next;
 	struct s_data		**dir;
 }						t_data;
@@ -94,6 +95,8 @@ char					*perms(int mode, t_flags *flags);
 ** sort.c
 */
 t_data					*sort_link_list(t_data *data,
+							t_flags *flags, int loop);
+t_data					*time_sort_link_list(t_data *data,
 							t_flags *flags, int loop);
 
 #endif
