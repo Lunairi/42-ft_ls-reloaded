@@ -50,7 +50,7 @@ typedef struct			s_data
 	long				sec;
 	char				suffix;
 	struct s_data		*next;
-	struct s_data		**d;
+	struct s_data		*d;
 }						t_data;
 
 typedef struct			s_flags
@@ -71,6 +71,7 @@ typedef struct			s_flags
 	unsigned int		minor;	
 	unsigned long long	size;
 	unsigned long long	i;
+	int					print;
 	// int					exist;
 	// int					file;
 	// int					fnlinks;
@@ -79,14 +80,15 @@ typedef struct			s_flags
 	// unsigned long long	fsize;
 	// unsigned int		fmajor;
 	// unsigned int		fminor;
-	// unsigned long long	total;
-	// unsigned long long	count;
+	unsigned long long	total;
+	unsigned long long	count;
 }						t_flags;
 
 /*
 ** parse_input.c
 */
 int						parse_input(int ac, char **av, int i);
+int						parse_dir(char *dir, t_flags *flags);
 
 /*
 ** parse_util.c
@@ -94,6 +96,7 @@ int						parse_input(int ac, char **av, int i);
 char					*perms(int mode, t_flags *flags);
 void					grab_data_length(t_data *data, t_flags *flags);
 void					suffix(char *dir, t_data *data);
+int						check_and_set_flags(char *str, t_flags *flags);
 
 /*
 ** sort.c

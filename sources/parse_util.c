@@ -13,6 +13,40 @@
 #include "ftls.h"
 
 /*
+** Function: check_and_set_flags
+** This function checks the passed string to see if it contained any of the
+** flags that is supported by ls. If so it will set the t_flags struct to 1
+** which will later be used to manipulate the printing output.
+** Otherwise if it's not valid
+** then it will print an error message. I know this is mimicing ubuntu/linux ls
+** instead of mac ls but I started this originally on a linux OS and like the
+** format of this more than the mac version.
+*/
+
+int		check_and_set_flags(char *str, t_flags *flags)
+{
+	int i;
+
+	i = 0;
+	while (str[++i] != '\0')
+	{
+		str[i] == 'r' ? flags->r = 1 : 0;
+		str[i] == 'a' ? flags->a = 1 : 0;
+		str[i] == 'l' ? flags->l = 1 : 0;
+		str[i] == 't' ? flags->t = 1 : 0;
+		str[i] == 'R' ? flags->re = 1 : 0;
+		if (str[i] != 'r' && str[i] != 'a' && str[i] != '1'
+			&& str[i] != 'l' && str[i] != 't' && str[i] != 'R')
+		{
+			ft_printf("ft_ls: illegal option -- '%c'\n", str[i]);
+			ft_printf("Try 'ft_ls --help' for more information.\n");
+			return (1);
+		}
+	}
+	return (0);
+}
+
+/*
 ** Function: suffix
 ** This function grabs the extended attribute values for
 ** diff files and will suffix it to the end of the bits later

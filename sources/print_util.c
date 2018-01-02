@@ -47,7 +47,7 @@ void	clear_buf(char *buf)
 {
 	int i;
 
-	i = ft_strlen(buf);
+	i = ft_strlen(buf) + 1;
 	while (i >= 0)
 	{
 		buf[i] = '\0';

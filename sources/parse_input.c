@@ -13,40 +13,6 @@
 #include "ftls.h"
 
 /*
-** Function: check_and_set_flags
-** This function checks the passed string to see if it contained any of the
-** flags that is supported by ls. If so it will set the t_flags struct to 1
-** which will later be used to manipulate the printing output.
-** Otherwise if it's not valid
-** then it will print an error message. I know this is mimicing ubuntu/linux ls
-** instead of mac ls but I started this originally on a linux OS and like the
-** format of this more than the mac version.
-*/
-
-int		check_and_set_flags(char *str, t_flags *flags)
-{
-	int i;
-
-	i = 0;
-	while (str[++i] != '\0')
-	{
-		str[i] == 'r' ? flags->r = 1 : 0;
-		str[i] == 'a' ? flags->a = 1 : 0;
-		str[i] == 'l' ? flags->l = 1 : 0;
-		str[i] == 't' ? flags->t = 1 : 0;
-		str[i] == 'R' ? flags->re = 1 : 0;
-		if (str[i] != 'r' && str[i] != 'a' && str[i] != '1'
-			&& str[i] != 'l' && str[i] != 't' && str[i] != 'R')
-		{
-			ft_printf("ft_ls: illegal option -- '%c'\n", str[i]);
-			ft_printf("Try 'ft_ls --help' for more information.\n");
-			return (1);
-		}
-	}
-	return (0);
-}
-
-/*
 ** Function: set_list_elements
 ** This function is to grab all the elements of the specific item that
 ** is being passed into here. It will be able to record the mode (type),
@@ -129,26 +95,65 @@ int		set_list_and_flags(char *str, char *dir, t_flags *flags, t_data **data)
 	return (0);
 }
 
+void	insert_stuff(t_data **data)
+{
+	t_data *new;
+	new = ft_memalloc(sizeof(t_data));
+	new->next = *data;
+	*data = new;
+}
+
+void	get_dir_content(char *str, t_data **data, t_flags *flags)
+{
+	DIR				*dirt;
+	struct dirent	*d;
+	t_data			*branch;
+	t_data			*ret;
+	char			*cur;
+
+	while ((d = readdir(dirt)))
+	{
+		branch = ft_memalloc(sizeof(t_data));
+		cur = ft_strjoin(str, "/");
+		set_list_and_flags(d->d_name, cur, flags, &branch);
+		branch->next = *data;
+		*data = branch;
+	}
+}
+
+void	branch_dir_content(char *av, t_data **data, t_flags *flags)
+{
+	t_data *new;
+
+	new = ft_memalloc(sizeof(t_data));
+	set_list_and_flags(av, NULL, flags, data);
+	if (S_ISDIR((*data)->mode))
+	{
+		get_dir_content(av, &new, flags);
+		(*data)->d = new;
+	}
+}
+
 /*
 ** Function: set_one_arg
 ** This function will handle zero or one arguments passed to ft_ls
 ** due to how they behave different than having multiple arguments.
 */
 
-void	set_one_arg(char **av, int ac, t_data **data, t_flags *flags)
+void	set_one_arg(char *av, int ac, t_data **data, t_flags *flags)
 {
 	DIR				*dirt;
 	struct dirent	*d;
 	char			*str;
 
 	if (ac == 1)
-		av[1] = ".";
-	str = av[1];
+		av = ".";
+	str = av;
 	if (str[0] == '-' && str[1] != '\0')
 	{
 		check_and_set_flags(str, flags);
 		str = ".";
-		av[1] = ".";
+		av = ".";
 	}
 	if (!(dirt = opendir(str)))
 	{
@@ -159,9 +164,23 @@ void	set_one_arg(char **av, int ac, t_data **data, t_flags *flags)
 	{
 		str = ft_strjoin(str, "/");
 		set_list_and_flags(d->d_name, str, flags, data);
-		str = av[1];
+		str = av;
 	}
 	closedir(dirt);
+}
+
+int		parse_dir(char *dir, t_flags *flags)
+{
+	t_data			*data;
+
+	data = ft_memalloc(sizeof(t_data));
+	set_one_arg(dir, 2, &data, flags);
+	data = sort_link_list(data, flags, 1);
+	if (flags->t == 1)
+		data = time_sort_link_list(data, flags, 1);
+	print_list(data, flags, 2);
+	free(data);
+	return (0);
 }
 
 /*
@@ -184,9 +203,10 @@ int		parse_input(int ac, char **av, int i)
 	data = ft_memalloc(sizeof(t_data));
 	flags = ft_memalloc(sizeof(t_flags));
 	if (ac <= 2)
-		set_one_arg(av, ac, &data, flags);
+		set_one_arg(av[1], ac, &data, flags);
 	while (av[++i] && ac > 2)
-		set_list_and_flags(av[i], NULL, flags, &data);
+		branch_dir_content(av[i], &data, flags);
+		// set_list_and_flags(av[i], NULL, flags, &data);
 	data = sort_link_list(data, flags, 1);
 	if (flags->t == 1)
 		data = time_sort_link_list(data, flags, 1);

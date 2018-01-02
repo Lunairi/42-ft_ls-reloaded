@@ -90,18 +90,147 @@ void	print_long(t_data *data, t_flags *flags)
 ** all the results.
 */
 
-void	print_list(t_data *data, t_flags *flags, int ac)
+void	print_behavior(t_data *data, t_flags *flags)
+{
+	if(flags->a && !flags->l)
+		ft_printf("%s\n", data->file);
+	else if (flags->l && flags->a)
+		print_long(data, flags);
+	else if (flags->l && data->file[0] != '.')
+		print_long(data, flags);
+	else if (data->file[0] != '.')
+		ft_printf("%s\n", data->file);
+}
+
+void	reset_flags(t_flags *flags)
+{
+	flags->nlinks = 0;
+	flags->uid = 0;
+	flags->gid = 0;
+	flags->major = 0;
+	flags->minor = 0;
+	flags->size = 0;
+	flags->device = 0;
+}
+
+// int		parse_recur(char *dir, t_flags *flags)
+// {
+// 	t_data			*data;
+
+// 	data = ft_memalloc(sizeof(t_data));
+// 	set_one_arg(dir, 2, &data, flags);
+// 	data = sort_link_list(data, flags, 1);
+// 	if (flags->t == 1)
+// 		data = time_sort_link_list(data, flags, 1);
+// 	print_list(data, flags, 2);
+// 	free(data);
+// 	return (0);
+// }
+
+
+void	print_recur(t_data *data, t_flags *flags)
+{
+	ft_printf("FUCK %s\n", data->dir);
+	while (data != NULL && data->next != NULL)
+	{
+		if (S_ISDIR(data->mode))
+		{ft_printf("FUCK");
+			if (flags->count++ != 0)
+				ft_printf("\n");
+			ft_printf("%s:\n", data->file);
+			reset_flags(flags);
+			parse_dir(data->file, flags);
+		}
+		data = data->next;
+	}
+}
+
+// void	print_dir(t_data *data, t_flags *flags)
+// {
+// 	while (data != NULL && data->next != NULL)
+// 	{
+// 		if (S_ISDIR(data->mode))
+// 		{
+// 			if (flags->count++ != 0)
+// 				ft_printf("\n");
+// 			ft_printf("%s:\n", data->file);
+// 			reset_flags(flags);
+// 			parse_dir(data->file, flags);
+// 		}
+// 		data = data->next;
+// 	}
+// }
+
+
+// int		parse_dir(char *dir, t_flags *flags)
+// {
+// 	t_data			*data;
+
+// 	data = ft_memalloc(sizeof(t_data));
+// 	set_one_arg(dir, 2, &data, flags);
+// 	data = sort_link_list(data, flags, 1);
+// 	if (flags->t == 1)
+// 		data = time_sort_link_list(data, flags, 1);
+// 	print_list(data, flags, 2);
+// 	free(data);
+// 	return (0);
+// }
+
+void	print_dir(t_data *data, t_flags *flags)
 {
 	while (data != NULL && data->next != NULL)
 	{
-		if(flags->a && !flags->l)
-			ft_printf("%s\n", data->file);
-		else if (flags->l && flags->a)
-			print_long(data, flags);
-		else if (flags->l && data->file[0] != '.')
-			print_long(data, flags);
-		else if (data->file[0] != '.')
-			ft_printf("%s\n", data->file);
+		// if (data->d != NULL)
+			ft_printf("DIRECTORY %s\n", data->file);
+		if (S_ISDIR(data->mode))
+		{
+			if (flags->count++ != 0)
+				ft_printf("\n");
+			ft_printf("%s:\n", data->file);
+			// ft_printf("FUCK %s %s\n", data->file, data->d->file);
+			// if (data->d != NULL)
+			// {
+			// 	data = sort_link_list(data, flags, 1);
+			// 		if (flags->t == 1)
+			// 	data = time_sort_link_list(data, flags, 1);
+			// }
+			if (data->d != NULL)
+			{
+				data = data->d;
+				ft_printf("NEXT ITEM %s\n", data->file);
+			}
+			while (data != NULL && data->next != NULL)
+			{
+				ft_printf("PENIS%s FUCK %s\n", data->file, data->next->file);
+				print_behavior(data, flags);
+				data = data->next;
+			}
+			// reset_flags(flags);
+			// parse_dir(data->file, flags);
+		}
 		data = data->next;
 	}
+}
+
+
+void	print_list(t_data *data, t_flags *flags, int ac)
+{
+	t_data *print;
+
+	print = data;
+	while (ac <= 2 && print != NULL && print->next != NULL && !flags->re)
+	{
+		print_behavior(print, flags);
+		print = print->next;
+	}
+	while (ac > 2 && print != NULL && print->next != NULL && flags->print++ == 0)
+	{
+		if (!S_ISDIR(print->mode))
+			print_behavior(print, flags);
+		print = print->next;
+	}
+	if (ac > 2)
+		print_dir(data, flags);
+	// else if (flags->re)
+	// 	print_recur(data, flags);
 }
