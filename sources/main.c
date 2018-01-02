@@ -34,6 +34,6 @@ int		main(int ac, char **av)
 	if(ac != 1)
 		if (!(ft_strcmp(av[1], "--help")))
 			return (help_ls());
-	parse_input(ac, av);
+	parse_input(ac, av, 0);
 	return (0);
 }

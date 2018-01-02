@@ -13,6 +13,55 @@
 #include "ftls.h"
 
 /*
+** Function: suffix
+** This function grabs the extended attribute values for
+** diff files and will suffix it to the end of the bits later
+** during printing.
+*/
+
+void	suffix(char *dir, t_data *data)
+{
+	acl_t			acl;
+	acl_entry_t		tmp;
+
+	acl = acl_get_link_np(dir, ACL_TYPE_EXTENDED);
+	if (acl && acl_get_entry(acl, ACL_FIRST_ENTRY, &tmp) == -1)
+	{
+		acl_free(acl);
+		acl = 0;
+	}
+	if (listxattr(dir, 0, 0, 0) > 0)
+		data->suffix = '@';
+	else if (acl != 0)
+		data->suffix = '+';
+	else
+		data->suffix = ' ';
+}
+
+/*
+** Function: grab_data_length
+** This function is used to grab the length of each information stored
+** to help with formatting when time comes for printing.
+*/
+
+void	grab_data_length(t_data *data, t_flags *flags)
+{
+	flags->blocks = flags->blocks + data->blocks;
+	if (ft_strlen(data->uid) > flags->uid)
+		flags->uid = ft_strlen(data->uid);
+	if (ft_strlen(data->gid) > flags->gid)
+		flags->gid = ft_strlen(data->gid);
+	if (ft_numullen(data->size) > flags->size)
+		flags->size = ft_numullen(data->size);
+	if (ft_numlen(data->nlinks) > flags->nlinks)
+		flags->nlinks = ft_numlen(data->nlinks);
+	if (ft_numlen(major(data->device)) > flags->major)
+		flags->major = ft_numlen(major(data->device));
+	if (ft_numlen(minor(data->device)) > flags->minor)
+		flags->minor = ft_numlen(minor(data->device));
+}
+
+/*
 ** Function: file_type
 ** This function is to help determine what type of mode the
 ** content that is being passed in is. It also will check for

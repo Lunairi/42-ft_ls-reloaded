@@ -13,36 +13,6 @@
 #include "ftls.h"
 
 /*
-** Function: swap_list
-** A simple function that takes two link list, a variable
-** for the iterative sort and sets it so that the function
-** knows a sort occured. It simply moves the pointers around
-** and returns the new swapped list.
-*/
-
-t_data	*swap_list(t_data *one, t_data *two, int *loop)
-{
-	one->next = two->next;
-	two->next = one;
-	*loop = 1;
-	return (two);
-}
-
-int		time_compare(t_data *one, t_data *two)
-{
-	if (one->mtime > two->mtime)
-		return (-1);
-	if (one->mtime == two->mtime)
-	{
-		if (one->nsec > two->nsec)
-			return (-1);
-		else if (one->nsec == two->nsec)
-			return (ft_strcmp(one->file, two->file));
-	}
-	return (1);
-}
-
-/*
 ** Function: time_sort_link_list
 ** This function is just like sort_link_list but instead this
 ** sorts the link list one more time based off time. It will

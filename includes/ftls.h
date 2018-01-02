@@ -36,9 +36,10 @@
 typedef struct			s_data
 {
 	char				*file;
+	char				*dir;
 	char				*bits;
 	int					mode;
-	// long long			blocks;
+	long long			blocks;
 	int					nlinks;
 	char				*uid;
 	char				*gid;
@@ -46,8 +47,10 @@ typedef struct			s_data
 	unsigned long long	size;
 	long				mtime;
 	long				nsec;
+	long				sec;
+	char				suffix;
 	struct s_data		*next;
-	struct s_data		**dir;
+	struct s_data		**d;
 }						t_data;
 
 typedef struct			s_flags
@@ -61,14 +64,13 @@ typedef struct			s_flags
 	long long			blocks;
 	int					endflag;
 	int					sort;
-	// int					nlinks;
-	// int					uid;
-	// int					gid;
-	// unsigned int		major;
-	// unsigned int		minor;
-	// int					device;
-	// unsigned long long	size;
-	// unsigned long long	i;
+	int					nlinks;
+	int					uid;
+	int					gid;
+	unsigned int		major;
+	unsigned int		minor;	
+	unsigned long long	size;
+	unsigned long long	i;
 	// int					exist;
 	// int					file;
 	// int					fnlinks;
@@ -84,12 +86,14 @@ typedef struct			s_flags
 /*
 ** parse_input.c
 */
-int						parse_input(int ac, char **av);
+int						parse_input(int ac, char **av, int i);
 
 /*
 ** parse_util.c
 */
 char					*perms(int mode, t_flags *flags);
+void					grab_data_length(t_data *data, t_flags *flags);
+void					suffix(char *dir, t_data *data);
 
 /*
 ** sort.c
@@ -98,5 +102,23 @@ t_data					*sort_link_list(t_data *data,
 							t_flags *flags, int loop);
 t_data					*time_sort_link_list(t_data *data,
 							t_flags *flags, int loop);
+
+/*
+** sort_util.c
+*/
+t_data					*swap_list(t_data *one, t_data *two, int *loop);
+int						time_compare(t_data *one, t_data *two);
+
+/*
+** print.c
+*/
+void					print_list(t_data *data, t_flags *flags, int ac);
+
+/*
+** print_util.c
+*/
+void					print_spacing(t_flags *flags);
+void					print_xattr(t_flags *flags, char *mtime);
+void					clear_buf(char *buf);
 
 #endif

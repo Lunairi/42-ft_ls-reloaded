@@ -57,18 +57,19 @@ int		check_and_set_flags(char *str, t_flags *flags)
 ** like -r -t -a etc.
 */
 
-int		set_list_elements(char *str, t_data *data, t_flags *flags)
+int		set_list_elements(char *str, char *dir, t_data *data, t_flags *flags)
 {
 	struct stat		items;
 	struct passwd	user;
 	struct group	group;
 
-	if (lstat(str, &items))
+	if (lstat(dir, &items))
 	{
 		ft_printf("Error %s: %s\n", str, strerror(errno));
 		return (0);
 	}
 	data->file = str;
+	data->blocks = items.st_blocks;
 	data->mode = items.st_mode;
 	user = *getpwuid(items.st_uid);
 	group = *getgrgid(items.st_gid);
@@ -80,6 +81,9 @@ int		set_list_elements(char *str, t_data *data, t_flags *flags)
 	data->device = items.st_rdev;
 	data->mtime = items.st_mtime;
 	data->nsec = items.st_mtimespec.tv_nsec;
+	data->sec = items.st_mtimespec.tv_sec;
+	suffix(dir, data);
+	grab_data_length(data, flags);
 	return (1);
 }
 
@@ -96,11 +100,11 @@ int		set_list_elements(char *str, t_data *data, t_flags *flags)
 ** Goals: Will also set and parse all other information needed
 */
 
-int		set_list_and_flags(char *str, t_flags *flags, t_data **data)
+int		set_list_and_flags(char *str, char *dir, t_flags *flags, t_data **data)
 {
 	t_data *new;
 
-	if (str[0] == '-' && flags->endflag != 1)
+	if (str[0] == '-' && str[1] != '\0' && flags->endflag != 1)
 	{
 		if (check_and_set_flags(str, flags))
 			return (0);
@@ -109,7 +113,14 @@ int		set_list_and_flags(char *str, t_flags *flags, t_data **data)
 	{
 		flags->endflag = 1;
 		new = ft_memalloc(sizeof(t_data));
-		if (set_list_elements(str, new, flags))
+		if (dir != NULL)
+		{
+			dir = ft_strjoin(dir, str);
+			new->dir = dir;
+		}
+		else
+			dir = str;
+		if (set_list_elements(str, dir, new, flags))
 		{
 			new->next = *data;
 			*data = new;
@@ -119,19 +130,38 @@ int		set_list_and_flags(char *str, t_flags *flags, t_data **data)
 }
 
 /*
-** Debugging function to make sure everything is being stored
-** properly in the link list
+** Function: set_one_arg
+** This function will handle zero or one arguments passed to ft_ls
+** due to how they behave different than having multiple arguments.
 */
 
-void	print_list(t_data *data)
+void	set_one_arg(char **av, int ac, t_data **data, t_flags *flags)
 {
-	ft_printf("Printing data\n");
-	while (data != NULL && data->next != NULL)
+	DIR				*dirt;
+	struct dirent	*d;
+	char			*str;
+
+	if (ac == 1)
+		av[1] = ".";
+	str = av[1];
+	if (str[0] == '-' && str[1] != '\0')
 	{
-		ft_printf("Current: %s (%i), Next: %s\n", data->file, data->mode, data->next->file);
-		ft_printf("%s %i %s %s %llu %s\n", data->bits, data->nlinks, data->uid, data->gid, data->size, ctime(&data->mtime));
-		data = data->next;
+		check_and_set_flags(str, flags);
+		str = ".";
+		av[1] = ".";
 	}
+	if (!(dirt = opendir(str)))
+	{
+		set_list_and_flags(str, NULL, flags, data);
+		return ;
+	}
+	while ((d = readdir(dirt)))
+	{
+		str = ft_strjoin(str, "/");
+		set_list_and_flags(d->d_name, str, flags, data);
+		str = av[1];
+	}
+	closedir(dirt);
 }
 
 /*
@@ -146,25 +176,21 @@ void	print_list(t_data *data)
 ** the same as "./ft_ls ."
 */
 
-int		parse_input(int ac, char **av)
+int		parse_input(int ac, char **av, int i)
 {
-	t_data	*data;
-	t_flags	*flags;
-	int		i;
+	t_data			*data;
+	t_flags			*flags;
 
-	i = 0;
 	data = ft_memalloc(sizeof(t_data));
 	flags = ft_memalloc(sizeof(t_flags));
-	if (ac == 1)
-		set_list_and_flags(".", flags, &data);
-	while (av[++i] && ac != 1)
-		set_list_and_flags(av[i], flags, &data);
-	print_list(data);
+	if (ac <= 2)
+		set_one_arg(av, ac, &data, flags);
+	while (av[++i] && ac > 2)
+		set_list_and_flags(av[i], NULL, flags, &data);
 	data = sort_link_list(data, flags, 1);
 	if (flags->t == 1)
 		data = time_sort_link_list(data, flags, 1);
-	ft_printf("New sorted\n");
-	print_list(data);
+	print_list(data, flags, ac);
 	free(data);
 	free(flags);
 	return (0);
