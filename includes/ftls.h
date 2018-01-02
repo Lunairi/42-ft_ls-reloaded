@@ -124,4 +124,7 @@ void					print_spacing(t_flags *flags);
 void					print_xattr(t_flags *flags, char *mtime);
 void					clear_buf(char *buf);
 
+void					free_dir(t_data *start);
+void					free_struct(t_data *data);
+
 #endif

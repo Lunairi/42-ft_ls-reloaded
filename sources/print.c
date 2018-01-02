@@ -39,7 +39,7 @@ void		print_date_name(t_data *data, t_flags *flags)
 			write(1, &mtime[flags->i], 1);
 	}
 	ft_printf(" %s", data->file);
-	if ((len = readlink(data->dir, buf, sizeof(buf) - 1)) != -1)
+	if ((len = readlink(data->dir, buf, sizeof(buf))) != -1)
 		ft_printf(" -> %s\n", buf);
 	else
 		ft_printf("\n");
@@ -98,8 +98,10 @@ void	print_behavior(t_data *data, t_flags *flags)
 		print_long(data, flags);
 	else if (flags->l && data->file[0] != '.')
 		print_long(data, flags);
-	else if (data->file[0] != '.')
+	else if (data->file && data->file[0] != '.')
+	{
 		ft_printf("%s\n", data->file);
+	}
 }
 
 void	reset_flags(t_flags *flags)
@@ -128,22 +130,22 @@ void	reset_flags(t_flags *flags)
 // }
 
 
-void	print_recur(t_data *data, t_flags *flags)
-{
-	ft_printf("FUCK %s\n", data->dir);
-	while (data != NULL && data->next != NULL)
-	{
-		if (S_ISDIR(data->mode))
-		{ft_printf("FUCK");
-			if (flags->count++ != 0)
-				ft_printf("\n");
-			ft_printf("%s:\n", data->file);
-			reset_flags(flags);
-			parse_dir(data->file, flags);
-		}
-		data = data->next;
-	}
-}
+// void	print_recur(t_data *data, t_flags *flags)
+// {
+// 	ft_printf("FUCK %s\n", data->dir);
+// 	while (data != NULL && data->next != NULL)
+// 	{
+// 		if (S_ISDIR(data->mode))
+// 		{ft_printf("FUCK");
+// 			if (flags->count++ != 0)
+// 				ft_printf("\n");
+// 			ft_printf("%s:\n", data->file);
+// 			reset_flags(flags);
+// 			parse_dir(data->file, flags);
+// 		}
+// 		data = data->next;
+// 	}
+// }
 
 // void	print_dir(t_data *data, t_flags *flags)
 // {
@@ -176,37 +178,56 @@ void	print_recur(t_data *data, t_flags *flags)
 // 	return (0);
 // }
 
+/*
+** Function: grab_data_length
+** This function is used to grab the length of each information stored
+** to help with formatting when time comes for printing.
+*/
+
+void	grab_dir_data_length(t_data *data, t_flags *flags)
+{
+	while(data != NULL && data->next != NULL)
+	{
+		flags->blocks = flags->blocks + data->blocks;
+		if (ft_strlen(data->uid) > flags->uid)
+			flags->uid = ft_strlen(data->uid);
+		if (ft_strlen(data->gid) > flags->gid)
+			flags->gid = ft_strlen(data->gid);
+		if (ft_numullen(data->size) > flags->size)
+			flags->size = ft_numullen(data->size);
+		if (ft_numlen(data->nlinks) > flags->nlinks)
+			flags->nlinks = ft_numlen(data->nlinks);
+		if (ft_numlen(major(data->device)) > flags->major)
+			flags->major = ft_numlen(major(data->device));
+		if (ft_numlen(minor(data->device)) > flags->minor)
+			flags->minor = ft_numlen(minor(data->device));
+		data = data->next;
+	}
+}
+
 void	print_dir(t_data *data, t_flags *flags)
 {
+	t_data *dir;
+
 	while (data != NULL && data->next != NULL)
 	{
-		// if (data->d != NULL)
-			ft_printf("DIRECTORY %s\n", data->file);
 		if (S_ISDIR(data->mode))
 		{
+			reset_flags(flags);
 			if (flags->count++ != 0)
 				ft_printf("\n");
 			ft_printf("%s:\n", data->file);
-			// ft_printf("FUCK %s %s\n", data->file, data->d->file);
-			// if (data->d != NULL)
-			// {
-			// 	data = sort_link_list(data, flags, 1);
-			// 		if (flags->t == 1)
-			// 	data = time_sort_link_list(data, flags, 1);
-			// }
 			if (data->d != NULL)
 			{
-				data = data->d;
-				ft_printf("NEXT ITEM %s\n", data->file);
+				dir = data->d;
+				grab_dir_data_length(dir, flags);
+				while (dir != NULL && dir->next != NULL)
+				{
+					if (ft_strcmp(dir->file, "") && ft_strcmp(dir->file, ""))
+						print_behavior(dir, flags);
+					dir = dir->next;
+				}
 			}
-			while (data != NULL && data->next != NULL)
-			{
-				ft_printf("PENIS%s FUCK %s\n", data->file, data->next->file);
-				print_behavior(data, flags);
-				data = data->next;
-			}
-			// reset_flags(flags);
-			// parse_dir(data->file, flags);
 		}
 		data = data->next;
 	}
@@ -218,15 +239,18 @@ void	print_list(t_data *data, t_flags *flags, int ac)
 	t_data *print;
 
 	print = data;
-	while (ac <= 2 && print != NULL && print->next != NULL && !flags->re)
+	while (ac <= 2 && print->file != NULL && print->next != NULL && !flags->re)
 	{
 		print_behavior(print, flags);
 		print = print->next;
 	}
-	while (ac > 2 && print != NULL && print->next != NULL && flags->print++ == 0)
+	while (ac > 2 && print->file != NULL && print->next != NULL)
 	{
 		if (!S_ISDIR(print->mode))
+		{
+			flags->count++;
 			print_behavior(print, flags);
+		}
 		print = print->next;
 	}
 	if (ac > 2)

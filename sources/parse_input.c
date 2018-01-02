@@ -34,7 +34,7 @@ int		set_list_elements(char *str, char *dir, t_data *data, t_flags *flags)
 		ft_printf("Error %s: %s\n", str, strerror(errno));
 		return (0);
 	}
-	data->file = str;
+	data->file = ft_strdup(str);
 	data->blocks = items.st_blocks;
 	data->mode = items.st_mode;
 	user = *getpwuid(items.st_uid);
@@ -95,29 +95,30 @@ int		set_list_and_flags(char *str, char *dir, t_flags *flags, t_data **data)
 	return (0);
 }
 
-void	insert_stuff(t_data **data)
-{
-	t_data *new;
-	new = ft_memalloc(sizeof(t_data));
-	new->next = *data;
-	*data = new;
-}
-
 void	get_dir_content(char *str, t_data **data, t_flags *flags)
 {
 	DIR				*dirt;
 	struct dirent	*d;
-	t_data			*branch;
 	t_data			*ret;
 	char			*cur;
 
+	dirt = opendir(str);
 	while ((d = readdir(dirt)))
 	{
-		branch = ft_memalloc(sizeof(t_data));
 		cur = ft_strjoin(str, "/");
-		set_list_and_flags(d->d_name, cur, flags, &branch);
-		branch->next = *data;
-		*data = branch;
+		set_list_and_flags(d->d_name, cur, flags, data);
+		free(cur);
+	}
+	closedir(dirt);
+}
+
+void	printlist(t_data *data)
+{
+	ft_printf("ASKJDHAS\n");
+	while (data != NULL && data->next != NULL)
+	{
+		ft_printf("TEST %s || DIR %s\n", data->file, data->dir);
+		data = data->next;
 	}
 }
 
@@ -130,8 +131,13 @@ void	branch_dir_content(char *av, t_data **data, t_flags *flags)
 	if (S_ISDIR((*data)->mode))
 	{
 		get_dir_content(av, &new, flags);
-		(*data)->d = new;
+		new = sort_link_list(new, flags, 1);
+		if (flags->t == 1)
+			new = time_sort_link_list(new, flags, 1);
+		 (*data)->d = new;
 	}
+	else
+		free(new);
 }
 
 /*
@@ -164,23 +170,49 @@ void	set_one_arg(char *av, int ac, t_data **data, t_flags *flags)
 	{
 		str = ft_strjoin(str, "/");
 		set_list_and_flags(d->d_name, str, flags, data);
+		free(str);
 		str = av;
 	}
 	closedir(dirt);
 }
 
-int		parse_dir(char *dir, t_flags *flags)
-{
-	t_data			*data;
+// int		parse_dir(char *dir, t_flags *flags)
+// {
+// 	t_data			*data;
 
-	data = ft_memalloc(sizeof(t_data));
-	set_one_arg(dir, 2, &data, flags);
-	data = sort_link_list(data, flags, 1);
-	if (flags->t == 1)
-		data = time_sort_link_list(data, flags, 1);
-	print_list(data, flags, 2);
+// 	data = ft_memalloc(sizeof(t_data));
+// 	set_one_arg(dir, 2, &data, flags);
+// 	data = sort_link_list(data, flags, 1);
+// 	if (flags->t == 1)
+// 		data = time_sort_link_list(data, flags, 1);
+// 	print_list(data, flags, 2);
+// 	free(data);
+// 	return (0);
+// }
+
+void				free_struct(t_data *data)
+{
+	if (data->d)
+		free_dir(data->d);
+	if (data->file)
+		free(data->file);
+	if (data->dir)
+		free(data->dir);
 	free(data);
-	return (0);
+}
+
+void				free_dir(t_data *start)
+{
+	t_data			*ptr;
+	t_data			*next;
+
+	ptr = start;
+	while (ptr) {
+		next = ptr->next;
+		free_struct(ptr);
+		ptr = next;
+	}
+	free(ptr);
 }
 
 /*
@@ -210,8 +242,12 @@ int		parse_input(int ac, char **av, int i)
 	data = sort_link_list(data, flags, 1);
 	if (flags->t == 1)
 		data = time_sort_link_list(data, flags, 1);
+	// printlist(data);
 	print_list(data, flags, ac);
-	free(data);
+	/*if (data->file)
+		free(data->file);
+	free(data);*/
+	free_struct(data);
 	free(flags);
 	return (0);
 }

@@ -76,8 +76,8 @@ t_data	*sort_link_list(t_data *data, t_flags *flags, int loop)
 		two = new->next;
 		while (two->file != NULL && two->next->file != NULL)
 		{
-			if ((ft_strcmp(two->file, two->next->file) >= 0 && flags->r == 0)
-			|| (ft_strcmp(two->next->file, two->file) >= 0 && flags->r == 1))
+			if ((ft_strcmp(two->file, two->next->file) > 0 && flags->r == 0)
+			|| (ft_strcmp(two->next->file, two->file) > 0 && flags->r == 1))
 				one->next = swap_list(two, two->next, &loop);
 			one = two;
 			if (two->next->file != NULL)
