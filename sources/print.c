@@ -210,7 +210,7 @@ void	print_dir(t_data *data, t_flags *flags)
 						print_behavior(dir, flags);
 					dir = dir->next;
 				}
-				free_struct(dir);
+				free_struct(&dir);
 			}
 		}
 		data = data->next;
@@ -251,7 +251,7 @@ void	print_recur(t_data *data, t_flags *flags)
 						branch_dir_content(re->dir, &con, flags);
 						print_recur(con, flags);
 					}
-					free_struct(con);
+					free(con);
 					re = re->next;
 				}
 			}

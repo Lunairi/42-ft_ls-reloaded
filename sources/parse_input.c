@@ -68,8 +68,7 @@ int		set_list_elements(char *str, char *dir, t_data *data, t_flags *flags)
 
 int		set_list_and_flags(char *str, char *dir, t_flags *flags, t_data **data)
 {
-	t_data *new;
-	char *tmp;
+	t_data	*new;
 
 	if (str[0] == '-' && str[1] != '\0' && flags->endflag != 1)
 	{
@@ -79,17 +78,19 @@ int		set_list_and_flags(char *str, char *dir, t_flags *flags, t_data **data)
 	else
 	{
 		flags->endflag = 1;
-		if (dir != NULL)
-			tmp = ft_strjoin(dir, str);
-		else
-			tmp = str;
 		new = ft_memalloc(sizeof(t_data));
-		if (set_list_elements(str, tmp, new, flags))
+		if (dir != NULL)
+			dir = ft_strjoin(dir, str);
+		else
+			dir = ft_strdup(str);
+		if (set_list_elements(str, dir, new, flags))
 		{
-			new->dir = tmp;
+			new->dir = dir;
 			new->next = *data;
 			*data = new;
 		}
+		else
+			free(new);
 	}
 	return (0);
 }
@@ -119,18 +120,18 @@ void	branch_dir_content(char *av, t_data **data, t_flags *flags)
 {
 	t_data *new;
 
-	new = ft_memalloc(sizeof(t_data));
 	set_list_and_flags(av, NULL, flags, data);
 	if (S_ISDIR((*data)->mode))
 	{
+		new = ft_memalloc(sizeof(t_data));
 		get_dir_content(av, &new, flags);
 		new = sort_link_list(new, flags, 1);
 		if (flags->t == 1)
 			new = time_sort_link_list(new, flags, 1);
-		 (*data)->d = new;
+		(*data)->d = new;
 	}
 	else
-		free(new);
+		(*data)->d = NULL;
 }
 
 /*
@@ -183,30 +184,77 @@ void	set_one_arg(char *av, int ac, t_data **data, t_flags *flags)
 // 	return (0);
 // }
 
-void				free_struct(t_data *data)
+void				free_struct_h(t_data *data)
 {
-	if (data->d)
-		free_dir(data->d);
-	if (data->file)
-		free(data->file);
-	if (data->dir)
-		free(data->dir);
-}
+	t_data	*tmp;
 
-void				free_dir(t_data *start)
-{
-	t_data			*ptr;
-	t_data			*next;
-
-	ptr = start;
-	while (ptr){
-		next = ptr->next;
-		free_struct(ptr);
-		free(ptr);
-		ptr = next;
+	while (data && data->next)
+	{
+		tmp = data->next;
+		if (data->d)
+		{
+			free_struct_h(data->d);
+			free(data->d);
+			data->d = NULL;
+		}
+		if (data->file)
+		{
+			free(data->file);
+			data->file = NULL;
+		}
+		if (data->dir)
+		{
+			free(data->dir);
+			data->dir = NULL;
+		}
+		// free(data);
+		data = tmp;
 	}
-	free(ptr);
 }
+
+void				free_struct(t_data **data)
+{
+	t_data	*tmp;
+
+	while (data && *data)
+	{
+		tmp = (*data)->next;
+		if ((*data)->d)
+		{
+			free_struct_h((*data)->d);
+			// free((*data)->d);
+			(*data)->d = NULL;
+		}
+		if ((*data)->file)
+		{
+			free((*data)->file);
+			(*data)->file = NULL;
+		}
+		if ((*data)->dir)
+		{
+			free((*data)->dir);
+			(*data)->dir = NULL;
+		}
+		free(*data);
+		*data = tmp;
+	}
+}
+
+// void				free_dir(t_data *start)
+// {
+// 	t_data			*ptr;
+// 	t_data			*next;
+
+// 	ptr = start;
+// 	while (ptr)
+// 	{
+// 		next = ptr->next;
+// 		free_struct(ptr);
+// 		free(ptr);
+// 		ptr = next;
+// 	}
+// 	free(ptr);
+// }
 
 /*
 ** Function: parse_input
@@ -231,15 +279,12 @@ int		parse_input(int ac, char **av, int i)
 		set_one_arg(av[1], ac, &data, flags);
 	while (av[++i] && ac > 2)
 		branch_dir_content(av[i], &data, flags);
-		// set_list_and_flags(av[i], NULL, flags, &data);
 	data = sort_link_list(data, flags, 1);
 	if (flags->t == 1)
 		data = time_sort_link_list(data, flags, 1);
-	// printlist(data);
 	if (flags->error != 1)
 		print_list(data, flags, ac);
-	// free(data);
-	free_struct(data);
+	free_struct(&data);
 	free(flags);
 	return (0);
 }
