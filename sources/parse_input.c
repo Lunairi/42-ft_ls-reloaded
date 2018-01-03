@@ -78,7 +78,8 @@ int		set_list_and_flags(char *str, char *dir, t_flags *flags, t_data **data)
 	else
 	{
 		flags->endflag = 1;
-		new = ft_memalloc(sizeof(t_data));
+		// if (!new)
+			new = ft_memalloc(sizeof(t_data));
 		if (dir != NULL)
 			dir = ft_strjoin(dir, str);
 		else
@@ -92,10 +93,10 @@ int		set_list_and_flags(char *str, char *dir, t_flags *flags, t_data **data)
 		else
 			free(new);
 	}
-	return (0);
+	return (1);
 }
 
-void	get_dir_content(char *str, t_data **data, t_flags *flags)
+int		get_dir_content(char *str, t_data **data, t_flags *flags)
 {
 	DIR				*dirt;
 	struct dirent	*d;
@@ -103,10 +104,7 @@ void	get_dir_content(char *str, t_data **data, t_flags *flags)
 	char			*cur;
 
 	if (!(dirt = opendir(str)))
-	{
-		ft_printf("ft_ls %s: %s\n", str, strerror(errno));
-		return ;
-	}
+		return (0);
 	while ((d = readdir(dirt)))
 	{
 		cur = ft_strjoin(str, "/");
@@ -114,17 +112,23 @@ void	get_dir_content(char *str, t_data **data, t_flags *flags)
 		free(cur);
 	}
 	closedir(dirt);
+	return (1);
 }
 
 void	branch_dir_content(char *av, t_data **data, t_flags *flags)
 {
 	t_data *new;
 
-	set_list_and_flags(av, NULL, flags, data);
+	if (!(set_list_and_flags(av, NULL, flags, data)))
+		return ;
 	if (S_ISDIR((*data)->mode))
 	{
 		new = ft_memalloc(sizeof(t_data));
-		get_dir_content(av, &new, flags);
+		if (!(get_dir_content(av, &new, flags)))
+		{
+			free(new);
+			return ;
+		}
 		new = sort_link_list(new, flags, 1);
 		if (flags->t == 1)
 			new = time_sort_link_list(new, flags, 1);
@@ -162,6 +166,7 @@ void	set_one_arg(char *av, int ac, t_data **data, t_flags *flags)
 	}
 	while ((d = readdir(dirt)))
 	{
+		ft_printf("FUCK");
 		str = ft_strjoin(str, "/");
 		set_list_and_flags(d->d_name, str, flags, data);
 		free(str);
@@ -277,6 +282,8 @@ int		parse_input(int ac, char **av, int i)
 	flags = ft_memalloc(sizeof(t_flags));
 	if (ac <= 2)
 		set_one_arg(av[1], ac, &data, flags);
+	if (ac <= 2 && flags->re)
+		branch_dir_content(data->file, &data, flags);
 	while (av[++i] && ac > 2)
 		branch_dir_content(av[i], &data, flags);
 	data = sort_link_list(data, flags, 1);
