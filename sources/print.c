@@ -113,6 +113,7 @@ void	reset_flags(t_flags *flags)
 	flags->minor = 0;
 	flags->size = 0;
 	flags->device = 0;
+	flags->blocks = 0;
 }
 
 // void	print_dir(t_data *data, t_flags *flags)
@@ -170,7 +171,8 @@ void	grab_dir_data_length(t_data *data, t_flags *flags)
 {
 	while(data != NULL && data->next != NULL)
 	{
-		flags->blocks = flags->blocks + data->blocks;
+		if ((!flags->a && data->file[0] != '.') || (flags->a))
+			flags->blocks = flags->blocks + data->blocks;
 		if (ft_strlen(data->uid) > flags->uid)
 			flags->uid = ft_strlen(data->uid);
 		if (ft_strlen(data->gid) > flags->gid)
@@ -204,6 +206,7 @@ void	print_dir(t_data *data, t_flags *flags)
 			{
 				dir = data->d;
 				grab_dir_data_length(dir, flags);
+				ft_printf("total %lli\n", flags->blocks);
 				while (dir != NULL && dir->next != NULL)
 				{
 					if (ft_strcmp(dir->file, "") && ft_strcmp(dir->file, ""))
@@ -228,7 +231,7 @@ void	print_recur(t_data *data, t_flags *flags)
 		if (S_ISDIR(data->mode))
 		{
 			reset_flags(flags);
-			if (flags->count++ != 0)
+			if (flags->count++ != 0 && data->d != NULL)
 				ft_printf("\n");
 			if (data->d != NULL)
 			{
@@ -236,6 +239,7 @@ void	print_recur(t_data *data, t_flags *flags)
 				re = data->d;
 				grab_dir_data_length(dir, flags);
 				ft_printf("%s:\n", data->file);
+				ft_printf("total %lli\n", flags->blocks);
 				while (dir != NULL && dir->next != NULL)
 				{
 					if (ft_strcmp(dir->file, ""))
@@ -263,17 +267,17 @@ void	print_recur(t_data *data, t_flags *flags)
 
 
 
-void	print_list(t_data *data, t_flags *flags, int ac)
+void	print_list(t_data *data, t_flags *flags)
 {
 	t_data *print;
 
 	print = data;
-	while (ac <= 2 && print->file != NULL && print->next != NULL && !flags->re)
+	while (flags->ac <= 2 && print->file != NULL && print->next != NULL)
 	{
 		print_behavior(print, flags);
 		print = print->next;
 	}
-	while (ac > 2 && print->file != NULL && print->next != NULL)
+	while (flags->ac > 2 && print->file != NULL && print->next != NULL)
 	{
 		if (!S_ISDIR(print->mode))
 		{
@@ -282,7 +286,7 @@ void	print_list(t_data *data, t_flags *flags, int ac)
 		}
 		print = print->next;
 	}
-	if (ac > 2 && !flags->re)
+	if (flags->ac > 2 && !flags->re)
 		print_dir(data, flags);
 	else if (flags->re)
 		print_recur(data, flags);

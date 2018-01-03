@@ -166,7 +166,6 @@ void	set_one_arg(char *av, int ac, t_data **data, t_flags *flags)
 	}
 	while ((d = readdir(dirt)))
 	{
-		ft_printf("FUCK");
 		str = ft_strjoin(str, "/");
 		set_list_and_flags(d->d_name, str, flags, data);
 		free(str);
@@ -280,17 +279,18 @@ int		parse_input(int ac, char **av, int i)
 
 	data = ft_memalloc(sizeof(t_data));
 	flags = ft_memalloc(sizeof(t_flags));
+	flags->ac = ac;
 	if (ac <= 2)
 		set_one_arg(av[1], ac, &data, flags);
-	if (ac <= 2 && flags->re)
-		branch_dir_content(data->file, &data, flags);
+	if (flags->re)
+		branch_dir_content(".", &data, flags);
 	while (av[++i] && ac > 2)
 		branch_dir_content(av[i], &data, flags);
 	data = sort_link_list(data, flags, 1);
 	if (flags->t == 1)
 		data = time_sort_link_list(data, flags, 1);
 	if (flags->error != 1)
-		print_list(data, flags, ac);
+		print_list(data, flags);
 	free_struct(&data);
 	free(flags);
 	return (0);

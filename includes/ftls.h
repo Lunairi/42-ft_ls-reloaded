@@ -75,6 +75,7 @@ typedef struct			s_flags
 	unsigned long long	total;
 	unsigned long long	count;
 	int					error;
+	int					ac;
 }						t_flags;
 
 /*
@@ -109,7 +110,7 @@ int						time_compare(t_data *one, t_data *two);
 /*
 ** print.c
 */
-void					print_list(t_data *data, t_flags *flags, int ac);
+void					print_list(t_data *data, t_flags *flags);
 
 /*
 ** print_util.c

@@ -35,8 +35,8 @@ t_data	*time_sort_link_list(t_data *data, t_flags *flags, int loop)
 		two = new->next;
 		while (two->file != NULL && two->next->file != NULL)
 		{
-			if ((time_compare(two, two->next) >= 0 && flags->r == 0)
-			|| (time_compare(two->next, two) >= 0 && flags->r == 1))
+			if ((time_compare(two, two->next) > 0 && flags->r == 0)
+			|| (time_compare(two->next, two) > 0 && flags->r == 1))
 				one->next = swap_list(two, two->next, &loop);
 			one = two;
 			if (two->next->file != NULL)

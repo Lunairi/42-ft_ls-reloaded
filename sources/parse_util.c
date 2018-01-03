@@ -35,6 +35,7 @@ int		check_and_set_flags(char *str, t_flags *flags)
 		str[i] == 'l' ? flags->l = 1 : 0;
 		str[i] == 't' ? flags->t = 1 : 0;
 		str[i] == 'R' ? flags->re = 1 : 0;
+		str[i] == '1' ? flags->l = 0 : 0;
 		if (str[i] != 'r' && str[i] != 'a' && str[i] != '1'
 			&& str[i] != 'l' && str[i] != 't' && str[i] != 'R')
 		{
