@@ -115,38 +115,6 @@ void	reset_flags(t_flags *flags)
 	flags->device = 0;
 }
 
-// int		parse_recur(char *dir, t_flags *flags)
-// {
-// 	t_data			*data;
-
-// 	data = ft_memalloc(sizeof(t_data));
-// 	set_one_arg(dir, 2, &data, flags);
-// 	data = sort_link_list(data, flags, 1);
-// 	if (flags->t == 1)
-// 		data = time_sort_link_list(data, flags, 1);
-// 	print_list(data, flags, 2);
-// 	free(data);
-// 	return (0);
-// }
-
-
-// void	print_recur(t_data *data, t_flags *flags)
-// {
-// 	ft_printf("FUCK %s\n", data->dir);
-// 	while (data != NULL && data->next != NULL)
-// 	{
-// 		if (S_ISDIR(data->mode))
-// 		{ft_printf("FUCK");
-// 			if (flags->count++ != 0)
-// 				ft_printf("\n");
-// 			ft_printf("%s:\n", data->file);
-// 			reset_flags(flags);
-// 			parse_dir(data->file, flags);
-// 		}
-// 		data = data->next;
-// 	}
-// }
-
 // void	print_dir(t_data *data, t_flags *flags)
 // {
 // 	while (data != NULL && data->next != NULL)
@@ -165,6 +133,20 @@ void	reset_flags(t_flags *flags)
 
 
 // int		parse_dir(char *dir, t_flags *flags)
+// {
+// 	t_data			*data;
+
+// 	data = ft_memalloc(sizeof(t_data));
+// 	set_one_arg(dir, 2, &data, flags);
+// 	data = sort_link_list(data, flags, 1);
+// 	if (flags->t == 1)
+// 		data = time_sort_link_list(data, flags, 1);
+// 	print_list(data, flags, 2);
+// 	free(data);
+// 	return (0);
+// }
+
+// int		parse_recur(char *dir, t_flags *flags)
 // {
 // 	t_data			*data;
 
@@ -205,6 +187,7 @@ void	grab_dir_data_length(t_data *data, t_flags *flags)
 	}
 }
 
+
 void	print_dir(t_data *data, t_flags *flags)
 {
 	t_data *dir;
@@ -227,11 +210,57 @@ void	print_dir(t_data *data, t_flags *flags)
 						print_behavior(dir, flags);
 					dir = dir->next;
 				}
+				free_struct(dir);
 			}
 		}
 		data = data->next;
 	}
 }
+
+void	print_recur(t_data *data, t_flags *flags)
+{
+	t_data *dir;
+	t_data *re;
+	t_data *con;
+
+	while (data != NULL && data->next != NULL)
+	{
+		if (S_ISDIR(data->mode))
+		{
+			reset_flags(flags);
+			if (flags->count++ != 0)
+				ft_printf("\n");
+			if (data->d != NULL)
+			{
+				dir = data->d;
+				re = data->d;
+				grab_dir_data_length(dir, flags);
+				ft_printf("%s:\n", data->file);
+				while (dir != NULL && dir->next != NULL)
+				{
+					if (ft_strcmp(dir->file, ""))
+						print_behavior(dir, flags);
+					dir = dir->next;
+				}
+				while (re != NULL && re->next != NULL)
+				{
+					con = ft_memalloc(sizeof(t_data));
+					if (S_ISDIR(re->mode) && ft_strcmp(re->file, ".") && ft_strcmp(re->file, "..")
+						&& ft_strcmp(re->file, ""))
+					{
+						branch_dir_content(re->dir, &con, flags);
+						print_recur(con, flags);
+					}
+					free_struct(con);
+					re = re->next;
+				}
+			}
+		}
+		data = data->next;
+	}
+}
+
+
 
 
 void	print_list(t_data *data, t_flags *flags, int ac)
@@ -253,8 +282,8 @@ void	print_list(t_data *data, t_flags *flags, int ac)
 		}
 		print = print->next;
 	}
-	if (ac > 2)
+	if (ac > 2 && !flags->re)
 		print_dir(data, flags);
-	// else if (flags->re)
-	// 	print_recur(data, flags);
+	else if (flags->re)
+		print_recur(data, flags);
 }

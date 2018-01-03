@@ -72,16 +72,9 @@ typedef struct			s_flags
 	unsigned long long	size;
 	unsigned long long	i;
 	int					print;
-	// int					exist;
-	// int					file;
-	// int					fnlinks;
-	// int					fuid;
-	// int					fgid;
-	// unsigned long long	fsize;
-	// unsigned int		fmajor;
-	// unsigned int		fminor;
 	unsigned long long	total;
 	unsigned long long	count;
+	int					error;
 }						t_flags;
 
 /*
@@ -89,6 +82,7 @@ typedef struct			s_flags
 */
 int						parse_input(int ac, char **av, int i);
 int						parse_dir(char *dir, t_flags *flags);
+void					branch_dir_content(char *av, t_data **data, t_flags *flags);
 
 /*
 ** parse_util.c

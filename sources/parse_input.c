@@ -31,7 +31,7 @@ int		set_list_elements(char *str, char *dir, t_data *data, t_flags *flags)
 
 	if (lstat(dir, &items))
 	{
-		ft_printf("Error %s: %s\n", str, strerror(errno));
+		ft_printf("ft_ls %s: %s\n", str, strerror(errno));
 		return (0);
 	}
 	data->file = ft_strdup(str);
@@ -69,6 +69,7 @@ int		set_list_elements(char *str, char *dir, t_data *data, t_flags *flags)
 int		set_list_and_flags(char *str, char *dir, t_flags *flags, t_data **data)
 {
 	t_data *new;
+	char *tmp;
 
 	if (str[0] == '-' && str[1] != '\0' && flags->endflag != 1)
 	{
@@ -78,16 +79,14 @@ int		set_list_and_flags(char *str, char *dir, t_flags *flags, t_data **data)
 	else
 	{
 		flags->endflag = 1;
-		new = ft_memalloc(sizeof(t_data));
 		if (dir != NULL)
-		{
-			dir = ft_strjoin(dir, str);
-			new->dir = dir;
-		}
+			tmp = ft_strjoin(dir, str);
 		else
-			dir = str;
-		if (set_list_elements(str, dir, new, flags))
+			tmp = str;
+		new = ft_memalloc(sizeof(t_data));
+		if (set_list_elements(str, tmp, new, flags))
 		{
+			new->dir = tmp;
 			new->next = *data;
 			*data = new;
 		}
@@ -102,7 +101,11 @@ void	get_dir_content(char *str, t_data **data, t_flags *flags)
 	t_data			*ret;
 	char			*cur;
 
-	dirt = opendir(str);
+	if (!(dirt = opendir(str)))
+	{
+		ft_printf("ft_ls %s: %s\n", str, strerror(errno));
+		return ;
+	}
 	while ((d = readdir(dirt)))
 	{
 		cur = ft_strjoin(str, "/");
@@ -110,16 +113,6 @@ void	get_dir_content(char *str, t_data **data, t_flags *flags)
 		free(cur);
 	}
 	closedir(dirt);
-}
-
-void	printlist(t_data *data)
-{
-	ft_printf("ASKJDHAS\n");
-	while (data != NULL && data->next != NULL)
-	{
-		ft_printf("TEST %s || DIR %s\n", data->file, data->dir);
-		data = data->next;
-	}
 }
 
 void	branch_dir_content(char *av, t_data **data, t_flags *flags)
@@ -198,7 +191,6 @@ void				free_struct(t_data *data)
 		free(data->file);
 	if (data->dir)
 		free(data->dir);
-	free(data);
 }
 
 void				free_dir(t_data *start)
@@ -207,9 +199,10 @@ void				free_dir(t_data *start)
 	t_data			*next;
 
 	ptr = start;
-	while (ptr) {
+	while (ptr){
 		next = ptr->next;
 		free_struct(ptr);
+		free(ptr);
 		ptr = next;
 	}
 	free(ptr);
@@ -243,10 +236,9 @@ int		parse_input(int ac, char **av, int i)
 	if (flags->t == 1)
 		data = time_sort_link_list(data, flags, 1);
 	// printlist(data);
-	print_list(data, flags, ac);
-	/*if (data->file)
-		free(data->file);
-	free(data);*/
+	if (flags->error != 1)
+		print_list(data, flags, ac);
+	// free(data);
 	free_struct(data);
 	free(flags);
 	return (0);

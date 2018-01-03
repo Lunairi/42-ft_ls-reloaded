@@ -38,8 +38,10 @@ int		check_and_set_flags(char *str, t_flags *flags)
 		if (str[i] != 'r' && str[i] != 'a' && str[i] != '1'
 			&& str[i] != 'l' && str[i] != 't' && str[i] != 'R')
 		{
-			ft_printf("ft_ls: illegal option -- '%c'\n", str[i]);
+			ft_printf("ft_ls: illegal option -- %c\n", str[i]);
+			ft_printf("usage: ls [-alrRt1] [file ...]\n");
 			ft_printf("Try 'ft_ls --help' for more information.\n");
+			flags->error = 1;
 			return (1);
 		}
 	}
