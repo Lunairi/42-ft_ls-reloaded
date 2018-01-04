@@ -13,3 +13,5 @@ With this reloaded version where I re-write my ls I wanted to focus on:
 2) Reduce the amount of times I need to sort
 3) Simplify the data so there is less redundancy in the code
 4) Fix all the prior bugs in my previous ls
+
+Total time for optimization and rewriting this ls was around 30-40 hours, experimenting/fixing leaks/testing multiple stuff. Overall glad I did rewrite it, ls is a great project and will prep me for minishell (the next 42 project) if I choose to do the next system tier project.
