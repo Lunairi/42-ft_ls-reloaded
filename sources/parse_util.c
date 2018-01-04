@@ -23,7 +23,7 @@
 ** format of this more than the mac version.
 */
 
-int		check_and_set_flags(char *str, t_flags *flags)
+int			check_and_set_flags(char *str, t_flags *flags)
 {
 	int i;
 
@@ -56,7 +56,7 @@ int		check_and_set_flags(char *str, t_flags *flags)
 ** during printing.
 */
 
-void	suffix(char *dir, t_data *data)
+void		suffix(char *dir, t_data *data)
 {
 	acl_t			acl;
 	acl_entry_t		tmp;
@@ -79,7 +79,7 @@ void	suffix(char *dir, t_data *data)
 ** to help with formatting when time comes for printing.
 */
 
-void	grab_data_length(t_data *data, t_flags *flags)
+void		grab_data_length(t_data *data, t_flags *flags)
 {
 	flags->blocks = flags->blocks + data->blocks;
 	if (ft_strlen(data->uid) > flags->uid)

@@ -1,0 +1,24 @@
+ARG VALUES -la
+ARG VALUES testrecur
+MADE testrecur DIR (null)
+IS DIRECTORY testrecur
+MADE test1 DIR (null)
+MADE test2 DIR (null)
+MADE .. DIR (null)
+MADE test3 DIR (null)
+MADE . DIR (null)
+testrecur:
+total 40
+drwxr-xr-x    5 mlu  2017_january   4096 Dec  3 12:25 .
+drwxr-xr-x   12 mlu  2017_january   4096 Jan  3 15:25 ..
+drwxr-xr-x    8 mlu  2017_january   4096 Dec  3 13:44 test1
+drwxr-xr-x    7 mlu  2017_january   4096 Dec  3 13:44 test2
+drwxr-xr-x    8 mlu  2017_january   4096 Dec  3 13:44 test3
+FREE (null) DIR (null)
+FREE testrecur DIR testrecur
+FREE DIR . DIR testrecur/.
+FREE DIR .. DIR testrecur/..
+FREE DIR test1 DIR testrecur/test1
+FREE DIR test2 DIR testrecur/test2
+FREE DIR test3 DIR testrecur/test3
+FREE (null) DIR (null)

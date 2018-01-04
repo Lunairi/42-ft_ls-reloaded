@@ -68,7 +68,7 @@ typedef struct			s_flags
 	int					uid;
 	int					gid;
 	unsigned int		major;
-	unsigned int		minor;	
+	unsigned int		minor;
 	unsigned long long	size;
 	unsigned long long	i;
 	int					print;
@@ -81,9 +81,11 @@ typedef struct			s_flags
 /*
 ** parse_input.c
 */
-int						parse_input(int ac, char **av, int i);
 int						parse_dir(char *dir, t_flags *flags);
-void					branch_dir_content(char *av, t_data **data, t_flags *flags);
+void					branch_dir_content(char *av, t_data **data,
+							t_flags *flags);
+void					set_one_arg(char *av, int ac, t_data **data,
+							t_flags *flags);
 
 /*
 ** parse_util.c
@@ -111,15 +113,33 @@ int						time_compare(t_data *one, t_data *two);
 ** print.c
 */
 void					print_list(t_data *data, t_flags *flags);
+void					print_long(t_data *data, t_flags *flags);
+void					print_recur(t_data *data, t_flags *flags);
 
 /*
 ** print_util.c
 */
+void					reset_flags(t_flags *flags);
+void					print_behavior(t_data *data, t_flags *flags);
+void					print_date_name(t_data *data, t_flags *flags);
+void					grab_dir_data_length(t_data *data, t_flags *flags);
+
+/*
+** utility.c
+*/
+void					free_struct(t_data **data);
 void					print_spacing(t_flags *flags);
 void					print_xattr(t_flags *flags, char *mtime);
 void					clear_buf(char *buf);
 
-void					free_dir(t_data *start);
-void					free_struct(t_data **data);
+/*
+** norminette.c
+*/
+void					set_more_list_elements(char *str, char *dir,
+							t_data *data, t_flags *flags);
+void					set_str_av(char **av, char **str);
+void					reset_and_check_dir(t_flags *flags);
+void					print_recur_dir(t_data *data, t_flags *flags,
+							t_data *dir);
 
 #endif

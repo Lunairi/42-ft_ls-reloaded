@@ -48,8 +48,7 @@ int		set_list_elements(char *str, char *dir, t_data *data, t_flags *flags)
 	data->mtime = items.st_mtime;
 	data->nsec = items.st_mtimespec.tv_nsec;
 	data->sec = items.st_mtimespec.tv_sec;
-	suffix(dir, data);
-	grab_data_length(data, flags);
+	set_more_list_elements(str, dir, data, flags);
 	return (1);
 }
 
@@ -78,8 +77,7 @@ int		set_list_and_flags(char *str, char *dir, t_flags *flags, t_data **data)
 	else
 	{
 		flags->endflag = 1;
-		// if (!new)
-			new = ft_memalloc(sizeof(t_data));
+		new = ft_memalloc(sizeof(t_data));
 		if (dir != NULL)
 			dir = ft_strjoin(dir, str);
 		else
@@ -95,6 +93,14 @@ int		set_list_and_flags(char *str, char *dir, t_flags *flags, t_data **data)
 	}
 	return (1);
 }
+
+/*
+** Function: get_dir_content
+** This function is designed to pull all content of the dir and store
+** it into a new linked list. Once it's done it'll be set back to the
+** previous function where it'll be sorted and linked to the original
+** link list.
+*/
 
 int		get_dir_content(char *str, t_data **data, t_flags *flags)
 {
@@ -114,6 +120,13 @@ int		get_dir_content(char *str, t_data **data, t_flags *flags)
 	closedir(dirt);
 	return (1);
 }
+
+/*
+** Function: branch_dir_content
+** This function checks the input from multiple arguements and sees if
+** a directory or command. If it's a command it'll parse it and set
+** the elements inside the link list.
+*/
 
 void	branch_dir_content(char *av, t_data **data, t_flags *flags)
 {
@@ -156,8 +169,7 @@ void	set_one_arg(char *av, int ac, t_data **data, t_flags *flags)
 	if (str[0] == '-' && str[1] != '\0')
 	{
 		check_and_set_flags(str, flags);
-		str = ".";
-		av = ".";
+		set_str_av(&av, &str);
 	}
 	if (!(dirt = opendir(str)))
 	{
@@ -172,126 +184,4 @@ void	set_one_arg(char *av, int ac, t_data **data, t_flags *flags)
 		str = av;
 	}
 	closedir(dirt);
-}
-
-// int		parse_dir(char *dir, t_flags *flags)
-// {
-// 	t_data			*data;
-
-// 	data = ft_memalloc(sizeof(t_data));
-// 	set_one_arg(dir, 2, &data, flags);
-// 	data = sort_link_list(data, flags, 1);
-// 	if (flags->t == 1)
-// 		data = time_sort_link_list(data, flags, 1);
-// 	print_list(data, flags, 2);
-// 	free(data);
-// 	return (0);
-// }
-
-void				free_struct_h(t_data *data)
-{
-	t_data	*tmp;
-
-	while (data && data->next)
-	{
-		tmp = data->next;
-		if (data->d)
-		{
-			free_struct_h(data->d);
-			free(data->d);
-			data->d = NULL;
-		}
-		if (data->file)
-		{
-			free(data->file);
-			data->file = NULL;
-		}
-		if (data->dir)
-		{
-			free(data->dir);
-			data->dir = NULL;
-		}
-		// free(data);
-		data = tmp;
-	}
-}
-
-void				free_struct(t_data **data)
-{
-	t_data	*tmp;
-
-	while (data && *data)
-	{
-		tmp = (*data)->next;
-		if ((*data)->d)
-		{
-			free_struct_h((*data)->d);
-			// free((*data)->d);
-			(*data)->d = NULL;
-		}
-		if ((*data)->file)
-		{
-			free((*data)->file);
-			(*data)->file = NULL;
-		}
-		if ((*data)->dir)
-		{
-			free((*data)->dir);
-			(*data)->dir = NULL;
-		}
-		free(*data);
-		*data = tmp;
-	}
-}
-
-// void				free_dir(t_data *start)
-// {
-// 	t_data			*ptr;
-// 	t_data			*next;
-
-// 	ptr = start;
-// 	while (ptr)
-// 	{
-// 		next = ptr->next;
-// 		free_struct(ptr);
-// 		free(ptr);
-// 		ptr = next;
-// 	}
-// 	free(ptr);
-// }
-
-/*
-** Function: parse_input
-** This function will generate two structs that will be used.
-** First one is t_data, which is a linklist that will contain
-** all the inputs being passed in.
-** Second one is t_flags, which will contain all the flag flags
-** that will allow the specialize printing in ft_ls
-** If the ac == 1, meaning av[1] is NULL, it'll auto set the
-** file name (data->file) to "." which makes ./ft_ls behave
-** the same as "./ft_ls ."
-*/
-
-int		parse_input(int ac, char **av, int i)
-{
-	t_data			*data;
-	t_flags			*flags;
-
-	data = ft_memalloc(sizeof(t_data));
-	flags = ft_memalloc(sizeof(t_flags));
-	flags->ac = ac;
-	if (ac <= 2)
-		set_one_arg(av[1], ac, &data, flags);
-	if (flags->re)
-		branch_dir_content(".", &data, flags);
-	while (av[++i] && ac > 2)
-		branch_dir_content(av[i], &data, flags);
-	data = sort_link_list(data, flags, 1);
-	if (flags->t == 1)
-		data = time_sort_link_list(data, flags, 1);
-	if (flags->error != 1)
-		print_list(data, flags);
-	free_struct(&data);
-	free(flags);
-	return (0);
 }
