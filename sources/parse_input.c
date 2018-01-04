@@ -144,6 +144,7 @@ void	branch_dir_content(char *av, t_data **data, t_flags *flags)
 		if (new)
 		{
 			new = sort_link_list(new, flags, 1);
+			new = sort_link_list(new, flags, 1);
 			if (flags->t == 1)
 				new = time_sort_link_list(new, flags, 1);
 			(*data)->d = new;

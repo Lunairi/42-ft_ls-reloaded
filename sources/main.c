@@ -56,6 +56,7 @@ int		parse_input(int ac, char **av, int i)
 	while (av[++i] && ac > 2)
 		branch_dir_content(av[i], &data, flags);
 	data = sort_link_list(data, flags, 1);
+	data = sort_link_list(data, flags, 1);
 	if (flags->t == 1)
 		data = time_sort_link_list(data, flags, 1);
 	if (flags->error != 1)

@@ -62,13 +62,19 @@ void		suffix(char *dir, t_data *data)
 	acl_entry_t		tmp;
 
 	acl = acl_get_link_np(dir, ACL_TYPE_EXTENDED);
-	acl_get_entry(acl, ACL_FIRST_ENTRY, &tmp);
-	acl_free(acl);
-	acl = 0;
+	if (acl && acl_get_entry(acl, ACL_FIRST_ENTRY, &tmp) == -1)
+	{
+		acl_free(acl);
+		acl = 0;
+	}
 	if (listxattr(dir, 0, 0, 0) > 0)
 		data->suffix = '@';
 	else if (acl != 0)
+	{
+		acl_free(acl);
+		acl = 0;
 		data->suffix = '+';
+	}
 	else
 		data->suffix = ' ';
 }

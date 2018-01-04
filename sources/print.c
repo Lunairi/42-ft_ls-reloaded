@@ -22,13 +22,13 @@
 
 void	print_long(t_data *data, t_flags *flags)
 {
-	ft_printf("%s%c  ", perms(data->mode, flags), data->suffix);
+	ft_printf("%s%c ", perms(data->mode, flags), data->suffix);
 	if ((flags->i = (flags->nlinks - ft_numlen(data->nlinks))) > 0)
 		print_spacing(flags);
 	ft_printf("%i ", data->nlinks);
 	if ((flags->i = (flags->uid - ft_strlen(data->uid))) > 0)
 		print_spacing(flags);
-	ft_printf("%s  %s   ", data->uid, data->gid);
+	ft_printf("%s  %s  ", data->uid, data->gid);
 	if ((flags->i = (flags->gid - ft_strlen(data->gid))) > 0)
 		print_spacing(flags);
 	if (flags->device == 0)
