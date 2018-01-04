@@ -63,7 +63,8 @@ void	print_dir(t_data *data, t_flags *flags)
 		if (S_ISDIR(data->mode))
 		{
 			reset_and_check_dir(flags);
-			ft_printf("%s:\n", data->file);
+			if (flags->ac != 3)
+				ft_printf("%s:\n", data->file);
 			if (data->d != NULL)
 			{
 				dir = data->d;
@@ -149,6 +150,8 @@ void	print_list(t_data *data, t_flags *flags)
 	t_data *print;
 
 	print = data;
+	if (flags->l && flags->ac <= 2)
+		ft_printf("total %lli\n", flags->blocks);
 	while (flags->ac <= 2 && print->file != NULL && print->next != NULL)
 	{
 		print_behavior(print, flags);

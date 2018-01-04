@@ -12,6 +12,13 @@
 
 #include "ftls.h"
 
+int		check_content(t_data *data)
+{
+	if (data->file != NULL && data->next != NULL && data->next->file != NULL)
+		return (1);
+	return (0);
+}
+
 /*
 ** Function: time_sort_link_list
 ** This function is just like sort_link_list but instead this
@@ -28,8 +35,7 @@ t_data	*time_sort_link_list(t_data *data, t_flags *flags, int loop)
 
 	new = ft_memalloc(sizeof(t_data));
 	new->next = data;
-	while (loop && data->file != NULL && data->next != NULL
-		&& data->next->file != NULL)
+	while (loop && check_content(data))
 	{
 		loop = 0;
 		one = new;
@@ -71,8 +77,7 @@ t_data	*sort_link_list(t_data *data, t_flags *flags, int loop)
 
 	new = ft_memalloc(sizeof(t_data));
 	new->next = data;
-	while (loop && data->file != NULL && data->next != NULL
-		&& data->next->file != NULL)
+	while (loop && check_content(data))
 	{
 		loop = 0;
 		one = new;

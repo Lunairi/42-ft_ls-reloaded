@@ -81,7 +81,8 @@ void		suffix(char *dir, t_data *data)
 
 void		grab_data_length(t_data *data, t_flags *flags)
 {
-	flags->blocks = flags->blocks + data->blocks;
+	if ((!flags->a && data->file[0] != '.') || (flags->a))
+		flags->blocks = flags->blocks + data->blocks;
 	if (ft_strlen(data->uid) > flags->uid)
 		flags->uid = ft_strlen(data->uid);
 	if (ft_strlen(data->gid) > flags->gid)
