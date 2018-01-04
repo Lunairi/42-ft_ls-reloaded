@@ -65,6 +65,12 @@ int		set_list_elements(char *str, char *dir, t_data *data, t_flags *flags)
 ** Goals: Will also set and parse all other information needed
 */
 
+void	free_stuff(char *dir, t_data *new)
+{
+	free(dir);
+	free(new);
+}
+
 int		set_list_and_flags(char *str, char *dir, t_flags *flags, t_data **data)
 {
 	t_data	*new;
@@ -90,8 +96,9 @@ int		set_list_and_flags(char *str, char *dir, t_flags *flags, t_data **data)
 		}
 		else
 		{
-			free(dir);
-			free(new);
+			free_stuff(dir, new);
+			// free(dir);
+			// free(new);
 		}
 	}
 	return (1);
@@ -139,7 +146,6 @@ void	branch_dir_content(char *av, t_data **data, t_flags *flags)
 	if (S_ISDIR((*data)->mode))
 	{
 		new = ft_memalloc(sizeof(t_data));
-		//new = 0;
 		if (!(get_dir_content(av, &new, flags)))
 		{
 			free(new);
