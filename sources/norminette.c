@@ -13,6 +13,17 @@
 #include "ftls.h"
 
 /*
+** Function: free_stuff
+** Continuation of set_list_and_flags in parse_input.c due to norminette
+*/
+
+void	free_stuff(char *dir, t_data *new)
+{
+	free(dir);
+	free(new);
+}
+
+/*
 ** Function: print_recur_dir
 ** Continuation of print_recur in print.c due to norminette
 */

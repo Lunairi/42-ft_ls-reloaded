@@ -33,7 +33,6 @@
 
 # include "libft.h"
 
-
 typedef struct			s_data
 {
 	char				*file;
@@ -142,5 +141,6 @@ void					set_str_av(char **av, char **str);
 void					reset_and_check_dir(t_flags *flags);
 void					print_recur_dir(t_data *data, t_flags *flags,
 							t_data *dir);
+void					free_stuff(char *dir, t_data *new);
 
 #endif

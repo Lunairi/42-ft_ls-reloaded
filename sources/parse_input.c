@@ -65,12 +65,6 @@ int		set_list_elements(char *str, char *dir, t_data *data, t_flags *flags)
 ** Goals: Will also set and parse all other information needed
 */
 
-void	free_stuff(char *dir, t_data *new)
-{
-	free(dir);
-	free(new);
-}
-
 int		set_list_and_flags(char *str, char *dir, t_flags *flags, t_data **data)
 {
 	t_data	*new;
@@ -95,11 +89,7 @@ int		set_list_and_flags(char *str, char *dir, t_flags *flags, t_data **data)
 			*data = new;
 		}
 		else
-		{
 			free_stuff(dir, new);
-			// free(dir);
-			// free(new);
-		}
 	}
 	return (1);
 }
