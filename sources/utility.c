@@ -65,7 +65,7 @@ void	free_helper(t_data *data)
 {
 	t_data	*tmp;
 
-	while (data && data->next)
+	while (data)
 	{
 		tmp = data->next;
 		if (data->d)
@@ -84,6 +84,7 @@ void	free_helper(t_data *data)
 			free(data->dir);
 			data->dir = NULL;
 		}
+		free(data);
 		data = tmp;
 	}
 }

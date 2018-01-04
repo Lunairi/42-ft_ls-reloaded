@@ -33,6 +33,7 @@
 
 # include "libft.h"
 
+
 typedef struct			s_data
 {
 	char				*file;

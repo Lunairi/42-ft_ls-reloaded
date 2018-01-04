@@ -75,7 +75,7 @@ void	print_dir(t_data *data, t_flags *flags)
 						print_behavior(dir, flags);
 					dir = dir->next;
 				}
-				free_struct(&dir);
+				//free_struct(&dir);
 			}
 		}
 		data = data->next;
@@ -107,19 +107,23 @@ void	print_recur_process(t_data *data, t_flags *flags)
 	while (re != NULL && re->next != NULL)
 	{
 		con = ft_memalloc(sizeof(t_data));
+		//con = 0;
 		if (S_ISDIR(re->mode) && ft_strcmp(re->file, ".")
 			&& ft_strcmp(re->file, "..") && ft_strcmp(re->file, ""))
 		{
 			branch_dir_content(re->dir, &con, flags);
 			print_recur(con, flags);
 		}
-		free(con);
+		free_struct(&con);
 		re = re->next;
 	}
 }
 
 void	print_recur(t_data *data, t_flags *flags)
 {
+	t_data			*next;
+
+	next = 0;
 	while (data != NULL && data->next != NULL)
 	{
 		if (S_ISDIR(data->mode))
@@ -130,7 +134,9 @@ void	print_recur(t_data *data, t_flags *flags)
 			if (data->d != NULL)
 				print_recur_process(data, flags);
 		}
-		data = data->next;
+		next = data->next;
+		//free(data);
+		data = next;
 	}
 }
 

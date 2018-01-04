@@ -28,18 +28,18 @@ t_data	*time_sort_link_list(t_data *data, t_flags *flags, int loop)
 
 	new = ft_memalloc(sizeof(t_data));
 	new->next = data;
-	while (loop && data->file != NULL && data->next->file != NULL)
+	while (loop && data->file != NULL && data->next != NULL && data->next->file != NULL)
 	{
 		loop = 0;
 		one = new;
 		two = new->next;
-		while (two->file != NULL && two->next->file != NULL)
+		while (two->file != NULL && two->next != NULL && two->next->file != NULL)
 		{
 			if ((time_compare(two, two->next) > 0 && flags->r == 0)
 			|| (time_compare(two->next, two) > 0 && flags->r == 1))
 				one->next = swap_list(two, two->next, &loop);
 			one = two;
-			if (two->next->file != NULL)
+			if (two->next != NULL && two->next->file != NULL)
 				two = two->next;
 		}
 	}
@@ -69,18 +69,18 @@ t_data	*sort_link_list(t_data *data, t_flags *flags, int loop)
 
 	new = ft_memalloc(sizeof(t_data));
 	new->next = data;
-	while (loop && data->file != NULL && data->next->file != NULL)
+	while (loop && data->file != NULL && data->next != NULL && data->next->file != NULL)
 	{
 		loop = 0;
 		one = new;
 		two = new->next;
-		while (two->file != NULL && two->next->file != NULL)
+		while (two->file != NULL && two->next != NULL && two->next->file != NULL)
 		{
 			if ((ft_strcmp(two->file, two->next->file) > 0 && flags->r == 0)
 			|| (ft_strcmp(two->next->file, two->file) > 0 && flags->r == 1))
 				one->next = swap_list(two, two->next, &loop);
 			one = two;
-			if (two->next->file != NULL)
+			if (two->next != NULL && two->next->file != NULL)
 				two = two->next;
 		}
 	}

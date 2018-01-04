@@ -89,7 +89,10 @@ int		set_list_and_flags(char *str, char *dir, t_flags *flags, t_data **data)
 			*data = new;
 		}
 		else
+		{
+			free(dir);
 			free(new);
+		}
 	}
 	return (1);
 }
@@ -106,7 +109,6 @@ int		get_dir_content(char *str, t_data **data, t_flags *flags)
 {
 	DIR				*dirt;
 	struct dirent	*d;
-	t_data			*ret;
 	char			*cur;
 
 	if (!(dirt = opendir(str)))
@@ -137,15 +139,19 @@ void	branch_dir_content(char *av, t_data **data, t_flags *flags)
 	if (S_ISDIR((*data)->mode))
 	{
 		new = ft_memalloc(sizeof(t_data));
+		//new = 0;
 		if (!(get_dir_content(av, &new, flags)))
 		{
 			free(new);
 			return ;
 		}
-		new = sort_link_list(new, flags, 1);
-		if (flags->t == 1)
-			new = time_sort_link_list(new, flags, 1);
-		(*data)->d = new;
+		if (new)
+		{
+			new = sort_link_list(new, flags, 1);
+			if (flags->t == 1)
+				new = time_sort_link_list(new, flags, 1);
+			(*data)->d = new;
+		}
 	}
 	else
 		(*data)->d = NULL;
